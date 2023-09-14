@@ -1,19 +1,12 @@
 import { useEffect, useContext, useState } from 'react';
 import { pegaTudo } from '../requisicoes';
-import PlanetsContext from '../context/PlanetsContext';
+import PlanetsContext, { PlanetContextType } from '../context/PlanetsContext';
 
 function Table() {
-  const [planets, setPlanets] = useState([]);
-
-  useEffect(() => {
-    async function buscaInfos() {
-      const infos = await pegaTudo();
-      setPlanets(infos);
-    }
-    buscaInfos();
-  }, []);
-
   const contextoPlanetas = useContext(PlanetsContext);
+  const arrayDePlanetas = contextoPlanetas.planetas;
+
+  // console.log(contextoPlanetas.planetas);
 
   return (
     <div>
@@ -30,7 +23,6 @@ function Table() {
             <th>Terrain</th>
             <th>Surface water</th>
             <th>Population</th>
-            <th>Residents</th>
             <th>Films</th>
             <th>Created</th>
             <th>Edited</th>
@@ -38,10 +30,10 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          { planets.map((planeta: any, index: number) => {
+          { arrayDePlanetas.map((planeta: PlanetContextType, index: number) => {
             return (
               <tr
-                key={ contextoPlanetas.name }
+                key={ planeta.name }
               >
                 <td width={ 1 }>{`${planeta.name}`}</td>
                 <td width={ 1 }>{`${planeta.rotation_period}`}</td>
@@ -52,7 +44,6 @@ function Table() {
                 <td width={ 1 }>{`${planeta.terrain}`}</td>
                 <td width={ 1 }>{`${planeta.surface_water}`}</td>
                 <td width={ 1 }>{`${planeta.population}`}</td>
-                <td width={ 1 }>{`${planeta.residents}`}</td>
                 <td width={ 1 }>{`${planeta.films}`}</td>
                 <td width={ 1 }>{`${planeta.created}`}</td>
                 <td width={ 1 }>{`${planeta.edited}`}</td>
