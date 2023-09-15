@@ -12,25 +12,33 @@ function Table() {
     const caracteresBucados = event.target.value;
     setPalavraBuscada(caracteresBucados);
 
-    console.log('Caracteres buscados:');
-    console.log(caracteresBucados);
+    // console.log('Caracteres buscados:');
+    // console.log(caracteresBucados);
+    // console.log('palavra buscada:');
+    // console.log(palavraBuscada);
 
     const lowerCaracteresBuscados = caracteresBucados.toLocaleLowerCase();
 
-    console.log('Caracteres buscados em lower case:');
-    console.log(lowerCaracteresBuscados);
+    // console.log('Caracteres buscados em lower case:');
+    // console.log(lowerCaracteresBuscados);
 
     const retornoDaBusca = arrayDePlanetas.filter((planeta) => {
       return planeta.name.toLocaleLowerCase().includes(lowerCaracteresBuscados);
     });
 
-    console.log('retorno da busca:');
-    console.log(retornoDaBusca);
+    // console.log('retorno da busca:');
+    // console.log(retornoDaBusca);
 
     setPlanetasBuscados(retornoDaBusca);
 
-    console.log('Planetas buscado:');
-    console.log(planetasBuscados);
+    // console.log('Planetas buscado:');
+    // console.log(planetasBuscados);
+  }
+
+  let arrayASerExibido: PlanetContextType[] = [];
+  arrayASerExibido = [...arrayDePlanetas];
+  if (palavraBuscada.length > 0) {
+    arrayASerExibido = [...planetasBuscados];
   }
 
   return (
@@ -62,7 +70,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          { arrayDePlanetas.map((planeta: PlanetContextType, index: number) => {
+          { arrayASerExibido.map((planeta: PlanetContextType, index: number) => {
             return (
               <tr
                 key={ planeta.name }
