@@ -14,14 +14,11 @@ export default function PlanetsProvider({ children }: PlanetsProviderProps) {
   useEffect(() => {
     async function buscaInfos() {
       const infos = await pegaTudo();
-      setPlanets(infos);
+      setPlanets(infos); // array de planetas (objetos)!
+      // console.log(infos[0].name);    teste
     }
     buscaInfos();
   }, []);
-
-  //   async function pegaInfosApi() {
-  //     return pegaTudo();
-  //   }
 
   return (
     <PlanetsContext.Provider value={ { planetas: planets } }>

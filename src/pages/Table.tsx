@@ -1,15 +1,47 @@
-import { useEffect, useContext, useState } from 'react';
-import { pegaTudo } from '../requisicoes';
+import { useContext, useState, ChangeEvent } from 'react';
 import PlanetsContext, { PlanetContextType } from '../context/PlanetsContext';
 
 function Table() {
   const contextoPlanetas = useContext(PlanetsContext);
   const arrayDePlanetas = contextoPlanetas.planetas;
 
-  // console.log(contextoPlanetas.planetas);
+  const [palavraBuscada, setPalavraBuscada] = useState('');
+  const [planetasBuscados, setPlanetasBuscados] = useState<PlanetContextType[]>([]);
+
+  function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
+    const caracteresBucados = event.target.value;
+    setPalavraBuscada(caracteresBucados);
+
+    console.log('Caracteres buscados:');
+    console.log(caracteresBucados);
+
+    const lowerCaracteresBuscados = caracteresBucados.toLocaleLowerCase();
+
+    console.log('Caracteres buscados em lower case:');
+    console.log(lowerCaracteresBuscados);
+
+    const retornoDaBusca = arrayDePlanetas.filter((planeta) => {
+      return planeta.name.toLocaleLowerCase().includes(lowerCaracteresBuscados);
+    });
+
+    console.log('retorno da busca:');
+    console.log(retornoDaBusca);
+
+    setPlanetasBuscados(retornoDaBusca);
+
+    console.log('Planetas buscado:');
+    console.log(planetasBuscados);
+  }
 
   return (
     <div>
+      <input
+        type="text"
+        name="pesquisa"
+        value={ palavraBuscada }
+        onChange={ handleSearchChange }
+        data-testid="name-filter"
+      />
       <table border={ 1 } width={ 500 }>
         <thead>
           <th colSpan={ 20 }>Projeto Star Wars:</th>
