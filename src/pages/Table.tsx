@@ -1,5 +1,6 @@
 import React, { useContext, useState, ChangeEvent, useEffect } from 'react';
 import PlanetsContext, { PlanetContextType } from '../context/PlanetsContext';
+import { Filter } from '../types/Filter';
 
 function Table() {
   const contextoPlanetas = useContext(PlanetsContext);
@@ -10,8 +11,9 @@ function Table() {
   const [coluna, setColuna] = useState('population');
   const [operadorLogico, setOperadorLogico] = useState('maior que');
   const [valor, setValor] = useState(0);
+  const [arrayDeFiltros, setArrayDeFiltros] = useState<Filter[]>([]);
 
-  // Renderização padrão: ENCARECE ISSO????
+  // Renderização padrão:
   useEffect(() => {
     setPlanetasBuscados(arrayDePlanetas);
   }, [arrayDePlanetas]);
@@ -43,23 +45,36 @@ function Table() {
     setValor(parseInt(event.target.value, 10)); // conversão para decimal.
   }
 
-  function filtraNumericamente() {
-    // event.preventDefault();
-    const retornoFiltroNumerico = planetasBuscados.filter((planeta: any) => {
-      if (operadorLogico === 'maior que') {
-        return parseInt(planeta[coluna], 10) > valor;
-      } if (operadorLogico === 'menor que') {
-        return parseInt(planeta[coluna], 10) < valor;
-      }
-      return parseInt(planeta[coluna], 10) === valor;
+  function filtraNumericamente(filtros: any) {
+    let planetasFiltrados = planetasBuscados; // array de partida
+    filtros.forEach((filtro: Filter) => {
+      const planetasFiltradosAtual = planetasFiltrados.filter((planeta: any) => {
+        if (filtro.operator === 'maior que') {
+          return parseInt(planeta[filtro.column], 10) > filtro.value;
+        } if (filtro.operator === 'menor que') {
+          return parseInt(planeta[filtro.column], 10) < filtro.value;
+        }
+        return parseInt(planeta[filtro.column], 10) === filtro.value;
+      });
+      planetasFiltrados = planetasFiltradosAtual;
     });
-    return retornoFiltroNumerico;
+    return planetasFiltrados;
   }
 
   // Teste:
   function handleClick(event:any) {
     event.preventDefault();
-    const arrayFiltrado = filtraNumericamente();
+
+    const novoFiltro = {
+      column: coluna,
+      operator: operadorLogico,
+      value: valor,
+    };
+    const filtrosAtualizados = [...arrayDeFiltros, novoFiltro];
+    setArrayDeFiltros(filtrosAtualizados);
+    console.log(filtrosAtualizados);
+
+    const arrayFiltrado = filtraNumericamente(filtrosAtualizados);
     setPlanetasBuscados(arrayFiltrado);
   }
 
@@ -84,7 +99,7 @@ function Table() {
           >
             <option>population</option>
             <option>orbital_period</option>
-            <option>diameter</option>
+            <option value="diameter">diameter</option>
             <option>rotation_period</option>
             <option>surface_water</option>
           </select>
@@ -111,6 +126,27 @@ function Table() {
 
           <button data-testid="button-filter" onClick={ handleClick }>Filtrar</button>
         </form>
+      </div>
+      <div>
+        { arrayDeFiltros.map((filtro: Filter, index: number) => {
+          return (
+            <p key={ `filtro-${index}` }>
+              <span>
+                {filtro.column}
+                {' '}
+              </span>
+              <span>
+                {filtro.operator}
+                {' '}
+              </span>
+              <span>
+                {filtro.value}
+                {' '}
+              </span>
+              <span><button>Excluir</button></span>
+            </p>
+          );
+        })}
       </div>
       <table border={ 1 } width={ 500 }>
         <thead>
