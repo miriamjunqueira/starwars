@@ -1,4 +1,4 @@
-import { useContext, useState, ChangeEvent } from 'react';
+import React, { useContext, useState, ChangeEvent, useEffect } from 'react';
 import PlanetsContext, { PlanetContextType } from '../context/PlanetsContext';
 
 function Table() {
@@ -7,7 +7,16 @@ function Table() {
 
   const [palavraBuscada, setPalavraBuscada] = useState('');
   const [planetasBuscados, setPlanetasBuscados] = useState<PlanetContextType[]>([]);
+  const [coluna, setColuna] = useState('population');
+  const [operadorLogico, setOperadorLogico] = useState('maior que');
+  const [valor, setValor] = useState(0);
 
+  // Renderização padrão: ENCARECE ISSO????
+  useEffect(() => {
+    setPlanetasBuscados(arrayDePlanetas);
+  }, [arrayDePlanetas]);
+
+  // Rederização conforme busca textual:
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     const caracteresBucados = event.target.value;
     setPalavraBuscada(caracteresBucados);
@@ -21,21 +30,88 @@ function Table() {
     setPlanetasBuscados(retornoDaBusca);
   }
 
-  let arrayASerExibido: PlanetContextType[] = [];
-  arrayASerExibido = [...arrayDePlanetas];
-  if (palavraBuscada.length > 0) {
-    arrayASerExibido = [...planetasBuscados];
+  // Rederização conforme busca numérica:
+  function handleColumnOptionChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    setColuna(event.target.value);
+  }
+
+  function handleOperatorChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    setOperadorLogico(event.target.value);
+  }
+
+  function handleNumberInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setValor(parseInt(event.target.value, 10)); // conversão para decimal.
+  }
+
+  function filtraNumericamente() {
+    // event.preventDefault();
+    const retornoFiltroNumerico = planetasBuscados.filter((planeta: any) => {
+      if (operadorLogico === 'maior que') {
+        return parseInt(planeta[coluna], 10) > valor;
+      } if (operadorLogico === 'menor que') {
+        return parseInt(planeta[coluna], 10) < valor;
+      }
+      return parseInt(planeta[coluna], 10) === valor;
+    });
+    return retornoFiltroNumerico;
+  }
+
+  // Teste:
+  function handleClick(event:any) {
+    event.preventDefault();
+    const arrayFiltrado = filtraNumericamente();
+    setPlanetasBuscados(arrayFiltrado);
   }
 
   return (
     <div>
-      <input
-        type="text"
-        name="pesquisa"
-        value={ palavraBuscada }
-        onChange={ handleSearchChange }
-        data-testid="name-filter"
-      />
+      <div>
+        <input
+          type="text"
+          name="pesquisa"
+          value={ palavraBuscada }
+          onChange={ handleSearchChange }
+          data-testid="name-filter"
+        />
+      </div>
+      <div>
+        <form>
+          <select
+            name="coluna"
+            id="column-select"
+            data-testid="column-filter"
+            onChange={ handleColumnOptionChange }
+          >
+            <option>population</option>
+            <option>orbital_period</option>
+            <option>diameter</option>
+            <option>rotation_period</option>
+            <option>surface_water</option>
+          </select>
+
+          <select
+            name="faixa-valorativa"
+            id="value-range"
+            data-testid="comparison-filter"
+            onChange={ handleOperatorChange }
+          >
+            <option>maior que</option>
+            <option>menor que</option>
+            <option>igual a</option>
+          </select>
+
+          <input
+            type="number"
+            data-testid="value-filter"
+            id="input_number"
+            name="numbers"
+            value={ valor }
+            onChange={ handleNumberInputChange }
+          />
+
+          <button data-testid="button-filter" onClick={ handleClick }>Filtrar</button>
+        </form>
+      </div>
       <table border={ 1 } width={ 500 }>
         <thead>
           <th colSpan={ 20 }>Projeto Star Wars:</th>
@@ -56,7 +132,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          { arrayASerExibido.map((planeta: PlanetContextType, index: number) => {
+          { planetasBuscados.map((planeta: PlanetContextType) => {
             return (
               <tr
                 key={ planeta.name }
