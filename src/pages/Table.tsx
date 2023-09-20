@@ -12,6 +12,12 @@ function Table() {
   const [operadorLogico, setOperadorLogico] = useState('maior que');
   const [valor, setValor] = useState(0);
   const [arrayDeFiltros, setArrayDeFiltros] = useState<Filter[]>([]);
+  const [colunasASeremExibidasNoFiltro,
+    setColunasASeremExibidasNoFiltro] = useState<string[]>(['population',
+    'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
+  const [colunasSelecionadas, setColunasSelecionadas] = useState<string[]>([]);
+  const columns = ['population',
+    'orbital_period', 'diameter', 'rotation_period', 'surface_water'];
 
   // Renderização padrão:
   useEffect(() => {
@@ -76,6 +82,19 @@ function Table() {
 
     const arrayFiltrado = filtraNumericamente(filtrosAtualizados);
     setPlanetasBuscados(arrayFiltrado);
+
+    // Atualiza as opções disponiveis no selectde colunas:
+    const atualizacaoSelecao = [...colunasSelecionadas, coluna];
+    setColunasSelecionadas(atualizacaoSelecao);
+
+    const resultado = columns.filter((column) => {
+      const estaSelecionada = atualizacaoSelecao.some((colunaSelecionada) => {
+        return colunaSelecionada === column;
+      });
+      return !estaSelecionada;
+    });
+    const atualizacaoExibicao = resultado;
+    setColunasASeremExibidasNoFiltro(atualizacaoExibicao);
   }
 
   return (
@@ -97,11 +116,15 @@ function Table() {
             data-testid="column-filter"
             onChange={ handleColumnOptionChange }
           >
-            <option>population</option>
-            <option>orbital_period</option>
-            <option value="diameter">diameter</option>
-            <option>rotation_period</option>
-            <option>surface_water</option>
+            {colunasASeremExibidasNoFiltro.map((column, index:number) => {
+              return (
+                <option
+                  key={ index }
+                >
+                  {column}
+                </option>
+              );
+            })}
           </select>
 
           <select
