@@ -5,7 +5,7 @@ import Table from './pages/Table';
 function App() {
   return (
     <div>
-      <span>Star Wars Planets Search</span>
+      <h3>Star Wars Planets Search</h3>
       <Table />
     </div>
   );
