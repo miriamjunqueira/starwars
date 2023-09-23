@@ -106,6 +106,7 @@ function Table() {
           value={ palavraBuscada }
           onChange={ handleSearchChange }
           data-testid="name-filter"
+          className="search"
         />
       </div>
       <div>
@@ -196,7 +197,7 @@ function Table() {
               <tr
                 key={ planeta.name }
               >
-                <td width={ 1 }>{`${planeta.name}`}</td>
+                <td className="planet-name" width={ 1 }>{`${planeta.name}`}</td>
                 <td width={ 1 }>{`${planeta.rotation_period}`}</td>
                 <td width={ 1 }>{`${planeta.orbital_period}`}</td>
                 <td width={ 1 }>{`${planeta.diameter}`}</td>
