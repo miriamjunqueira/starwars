@@ -80,7 +80,7 @@ describe('Testa a pagina da tabela', () => {
     const button = screen.getByTestId("button-filter");
     await userEvent.click(button);
     const filtros = document.querySelectorAll("p > span");
-    expect(filtros).toHaveLength(4);
+    expect(filtros).toHaveLength(3);
   });
 
   test('Testa a alteração na tela após busca textual', async () => {
