@@ -52,7 +52,7 @@ function Table() {
   }
 
   function filtraNumericamente(filtros: any) {
-    let planetasFiltrados = planetasBuscados; // array de partida
+    let planetasFiltrados = arrayDePlanetas; // array de partida
     filtros.forEach((filtro: Filter) => {
       const planetasFiltradosAtual = planetasFiltrados.filter((planeta: any) => {
         if (filtro.operator === 'maior que') {
@@ -67,6 +67,16 @@ function Table() {
     return planetasFiltrados;
   }
 
+  function selecionarFiltrosAplicados(atualizacaoSelecao: any) {
+    const resultado = columns.filter((column) => {
+      const estaSelecionada = atualizacaoSelecao.some((colunaSelecionada: any) => {
+        return colunaSelecionada === column;
+      });
+      return !estaSelecionada;
+    });
+    return resultado;
+  }
+
   // Teste:
   function handleClick(event:any) {
     event.preventDefault();
@@ -78,23 +88,40 @@ function Table() {
     };
     const filtrosAtualizados = [...arrayDeFiltros, novoFiltro];
     setArrayDeFiltros(filtrosAtualizados);
-    console.log(filtrosAtualizados);
 
     const arrayFiltrado = filtraNumericamente(filtrosAtualizados);
     setPlanetasBuscados(arrayFiltrado);
 
-    // Atualiza as opções disponiveis no selectde colunas:
+    // Atualiza as opções disponiveis no select de colunas:
     const atualizacaoSelecao = [...colunasSelecionadas, coluna];
     setColunasSelecionadas(atualizacaoSelecao);
 
-    const resultado = columns.filter((column) => {
-      const estaSelecionada = atualizacaoSelecao.some((colunaSelecionada) => {
-        return colunaSelecionada === column;
-      });
-      return !estaSelecionada;
-    });
-    const atualizacaoExibicao = resultado;
+    const atualizacaoExibicao = selecionarFiltrosAplicados(atualizacaoSelecao);
     setColunasASeremExibidasNoFiltro(atualizacaoExibicao);
+  }
+
+  function handleDelete() {
+    setColunasSelecionadas([]);
+    setPlanetasBuscados(arrayDePlanetas);
+  }
+
+  function handleDeleteOneFilter(event: any) {
+    const colunaASerRestaurada = event.target.value;
+    const atualizacao = colunasSelecionadas.filter((col) => {
+      return colunaASerRestaurada !== col;
+    });
+    setColunasSelecionadas(atualizacao);
+
+    const atualizacaoExibicao = selecionarFiltrosAplicados(columns);
+    setColunasASeremExibidasNoFiltro(atualizacaoExibicao);
+
+    const atualizacaoFiltros = arrayDeFiltros.filter((filter) => {
+      return colunaASerRestaurada !== filter.column;
+    });
+    setArrayDeFiltros(atualizacaoFiltros);
+
+    const arrayFiltrado = filtraNumericamente(atualizacaoFiltros);
+    setPlanetasBuscados(arrayFiltrado);
   }
 
   return (
@@ -118,13 +145,7 @@ function Table() {
             onChange={ handleColumnOptionChange }
           >
             {colunasASeremExibidasNoFiltro.map((column, index:number) => {
-              return (
-                <option
-                  key={ index }
-                >
-                  {column}
-                </option>
-              );
+              return <option key={ index }>{column}</option>;
             })}
           </select>
 
@@ -149,12 +170,15 @@ function Table() {
           />
 
           <button data-testid="button-filter" onClick={ handleClick }>Filtrar</button>
+          <button data-testid="button-remove-filters" onClick={ handleDelete }>
+            Remover todas filtragens
+          </button>
         </form>
       </div>
       <div>
         { arrayDeFiltros.map((filtro: Filter, index: number) => {
           return (
-            <p key={ `filtro-${index}` }>
+            <p key={ `filtro-${index}` } data-testid="filter">
               <span>
                 {filtro.column}
                 {' '}
@@ -167,7 +191,9 @@ function Table() {
                 {filtro.value}
                 {' '}
               </span>
-              <span><button>Excluir</button></span>
+              <button value={ filtro.column } onClick={ handleDeleteOneFilter }>
+                Excluir
+              </button>
             </p>
           );
         })}
